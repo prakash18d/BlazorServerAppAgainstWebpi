@@ -1,0 +1,158 @@
+﻿@page "/employeeData"
+@using BlazorServerApp.Data
+
+@inject EmployeeService employeeService
+
+<h1>Employee</h1>
+
+<p>This component demonstrates managing Employee data.</p>
+
+@if (employess == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <button @onclick="@Add" class="btn btn-success">Add</button>
+    <table class='table table-hover'>
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Project Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in employess)
+            {
+                <tr @onclick="@(() => Show(item.EmployeeId))">
+                    <td>@item.EmployeeId</td>
+                    <td>@item.EmployeeFirstName</td>
+                    <td>@item.EmployeeLastName</td>
+                    <td>@item.pojectName</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (employess != null && mode == MODE.Add)
+{
+    <input placeholder="First Name" bind="@employeeFirstName" />
+    <br />
+    <input placeholder="Last Name" bind="@employeeLastName" />
+    <br />
+    <input placeholder="Project Name" bind="@projectName" />
+    <br />
+    
+    <button @onclick="@Insert" class="btn btn-warning">Insert</button>
+}
+
+@if (employess != null && mode == MODE.EditDelete) // Update & Delete form
+{
+    <input type="hidden" bind="@employeeId" />
+    <br />
+    <input placeholder="First Name" bind="@employeeFirstName" />
+    <br />
+    <input placeholder="Last Name" bind="@employeeLastName" />
+    <br />
+    <input placeholder="project" bind="@projectName" />
+    <br />
+    <button @onclick="@Update" class="btn btn-primary">Update</button>
+    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    <button  @onclick="@Delete" class="btn btn-danger">Delete</button>
+}
+
+@functions {
+    EmployeeClass[] employess;
+
+    string employeeId;
+    string employeeFirstName;
+    string employeeLastName;
+    string projectName;
+
+    private enum MODE { None, Add, EditDelete };
+    MODE mode = MODE.None;
+    EmployeeClass emp;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await load();
+    }
+
+    protected async Task load()
+    {
+        employess = await employeeService.GetEmployeesAsync();
+    }
+
+    protected async Task Insert()
+    {
+
+        EmployeeClass e = new EmployeeClass()
+        {
+            EmployeeId = Guid.NewGuid().ToString(),
+            EmployeeFirstName = employeeFirstName,
+            EmployeeLastName = employeeLastName,
+            pojectName = projectName
+        };
+
+        await employeeService.InsertEmployeeAsync(e);
+        ClearFields();
+        await load();
+        mode = MODE.None;
+    }
+
+    protected void ClearFields()
+    {
+        employeeId = string.Empty;
+
+        employeeFirstName = string.Empty;
+        employeeLastName = string.Empty;
+        projectName = string.Empty;
+    }
+
+    protected void Add()
+    {
+        ClearFields();
+        mode = MODE.Add;
+    }
+
+    protected async Task Update()
+    {
+
+        EmployeeClass e = new EmployeeClass()
+        {
+            EmployeeId = employeeId,
+            EmployeeFirstName = employeeFirstName,
+            EmployeeLastName = employeeLastName,
+            pojectName = projectName
+        };
+
+        await employeeService.UpdateEmployeeAsync(employeeId, e);
+        ClearFields();
+        await load();
+        mode = MODE.None;
+    }
+
+    protected async Task Delete()
+    {
+        await employeeService.DeleteEmployeeAsync(employeeId);
+        ClearFields();
+        await load();
+        mode = MODE.None;
+    }
+
+    protected async Task Show(string EmployeeId)
+    {
+        emp = await employeeService.GetEmployeesByIdAsync(EmployeeId);
+        employeeId = emp.EmployeeId;
+        employeeFirstName = emp.EmployeeFirstName;
+        employeeLastName = emp.EmployeeLastName;
+        projectName = emp.pojectName;
+        mode = MODE.EditDelete;
+    }
+}
+
+

@@ -40,11 +40,11 @@ else
 
 @if (employess != null && mode == MODE.Add)
 {
-    <input placeholder="First Name" bind="@employeeFirstName" />
+    <input placeholder="First Name" @bind="@employeeFirstName" />
     <br />
-    <input placeholder="Last Name" bind="@employeeLastName" />
+    <input placeholder="Last Name" @bind="@employeeLastName" />
     <br />
-    <input placeholder="Project Name" bind="@projectName" />
+    <input placeholder="Project Name" @bind="@projectName" />
     <br />
     
     <button @onclick="@Insert" class="btn btn-warning">Insert</button>
@@ -52,13 +52,13 @@ else
 
 @if (employess != null && mode == MODE.EditDelete) // Update & Delete form
 {
-    <input type="hidden" bind="@employeeId" />
+    <input type="hidden" @bind="@employeeId" />
     <br />
-    <input placeholder="First Name" bind="@employeeFirstName" />
+    <input placeholder="First Name" @bind="@employeeFirstName" />
     <br />
-    <input placeholder="Last Name" bind="@employeeLastName" />
+    <input placeholder="Last Name" @bind="@employeeLastName" />
     <br />
-    <input placeholder="project" bind="@projectName" />
+    <input placeholder="project" @bind="@projectName" />
     <br />
     <button @onclick="@Update" class="btn btn-primary">Update</button>
     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
